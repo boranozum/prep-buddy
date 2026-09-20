@@ -1,0 +1,20 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: paprika_ground
+names: {en: 'Paprika, sweet, ground', tr: Tatlı toz kırmızı biber (paprika)}
+aliases:
+  en: [paprika, sweet paprika]
+  tr: [paprika, tatlı toz kırmızı biber]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 282, protein_g: 14.1, fat_g: 12.9, carbs_g: 54.0, fiber_g: 34.9}
+allergens: []
+diet_flags: []
+shopping:
+  section: spices_oils
+  pack_sizes_g: [50]
+  staple: true
+edible_fraction: 1.0
+portion_step_g: 0.5
+validation: {kcal_check: exempt, reason: high-fiber spice}

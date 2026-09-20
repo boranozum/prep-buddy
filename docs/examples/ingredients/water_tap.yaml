@@ -1,0 +1,21 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: water_tap
+names: {en: Water, tr: Su}
+aliases:
+  en: [water]
+  tr: [su]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 0, protein_g: 0.0, fat_g: 0.0, carbs_g: 0.0, fiber_g: 0.0}
+density_g_per_ml: 1.0
+allergens: []
+diet_flags: []
+shopping:
+  section: none
+  pack_sizes_g: []
+  staple: false
+  skip: true
+edible_fraction: 1.0
+portion_step_g: 10

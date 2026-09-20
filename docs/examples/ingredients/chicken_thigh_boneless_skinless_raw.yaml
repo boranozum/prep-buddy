@@ -1,0 +1,20 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: chicken_thigh_boneless_skinless_raw
+names: {en: 'Chicken thigh, boneless, skinless, raw', tr: 'Tavuk but, kemiksiz, derisiz, çiğ'}
+aliases:
+  en: [chicken thigh]
+  tr: [tavuk but, kemiksiz tavuk but]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 121, protein_g: 19.7, fat_g: 4.1, carbs_g: 0.0, fiber_g: 0.0}
+yield: {cooked_state: roasted, mass_factor: 0.75}
+allergens: []
+diet_flags: [contains_meat, contains_animal_product]
+shopping:
+  section: meat_fish
+  pack_sizes_g: [500, 1000]
+  staple: false
+edible_fraction: 1.0
+portion_step_g: 5

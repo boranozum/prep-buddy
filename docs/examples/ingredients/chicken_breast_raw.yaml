@@ -1,0 +1,20 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: chicken_breast_raw
+names: {en: 'Chicken breast, boneless, skinless, raw', tr: 'Tavuk göğsü, kemiksiz, derisiz, çiğ'}
+aliases:
+  en: [chicken breast]
+  tr: [tavuk göğsü, piliç göğsü]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 120, protein_g: 22.5, fat_g: 2.6, carbs_g: 0.0, fiber_g: 0.0}
+yield: {cooked_state: pan_cooked, mass_factor: 0.75}
+allergens: []
+diet_flags: [contains_meat, contains_animal_product]
+shopping:
+  section: meat_fish
+  pack_sizes_g: [500, 1000]
+  staple: false
+edible_fraction: 1.0
+portion_step_g: 5

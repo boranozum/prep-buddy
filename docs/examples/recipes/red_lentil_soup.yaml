@@ -1,0 +1,227 @@
+# EXAMPLE RECIPE B: Mercimek çorbası (red lentil soup), stovetop only.
+# Teaches: a baseline that needs no special appliance plus an accelerator (blender), a second accelerator
+#          (pressure cooker) with its own text and a capacity limit, batching with recipe A (dice:onion),
+#          and a cooling hold limit before storage.
+schema_version: 1
+id: red_lentil_soup
+version: 1
+status: draft
+title: { en: "Red lentil soup", tr: "Mercimek çorbası" }
+description:
+  en: "A smooth, warming red lentil soup with onion, carrot and cumin. Freezes well."
+  tr: "Soğan, havuç ve kimyonlu, pürüzsüz ve doyurucu kırmızı mercimek çorbası. Dondurucuda iyi saklanır."
+base_servings: 4
+
+ingredients:
+  - { ingredient_id: red_lentils_dry_raw,     grams: 240,  role: main,     portion_group: soup }
+  - { ingredient_id: onion_yellow_raw,        grams: 150,  role: base,     portion_group: soup }
+  - { ingredient_id: carrot_raw,              grams: 150,  role: base,     portion_group: soup }
+  - { ingredient_id: tomato_paste,            grams: 25,   role: seasoning }
+  - { ingredient_id: olive_oil_extra_virgin,  grams: 25,   role: staple }
+  - { ingredient_id: cumin_ground,            grams: 2,    role: seasoning }
+  - { ingredient_id: salt_table,              grams: 6,    role: seasoning }
+  - { ingredient_id: pepper_black_ground,     grams: 1,    role: seasoning }
+  - { ingredient_id: water_tap,               grams: 1400, role: staple,   follows: red_lentils_dry_raw }
+
+scaling:
+  min_factor: 0.75
+  max_factor: 1.5
+
+tasks:
+  - id: rinse_lentils
+    op: wash
+    inputs: [red_lentils_dry_raw]
+    outputs: [rinsed_lentils]
+    needs: []
+    methods:
+      - id: sieve
+        baseline: true
+        requires: []
+        active: { fixed_min: 1, per_100g_min: 0.2 }
+    text:
+      brief:    { en: "Rinse the lentils.", tr: "Mercimeği yıkayın." }
+      detailed: { en: "Rinse {qty:red_lentils_dry_raw} of lentils in a sieve under cold water until the water runs clear.",
+                  tr: "{qty:red_lentils_dry_raw} mercimeği bir süzgeçte soğuk suyun altında su berraklaşana kadar yıkayın." }
+
+  - id: dice_onion
+    op: dice
+    inputs: [onion_yellow_raw]
+    outputs: [diced_onion]
+    needs: []
+    batch_key: "dice:onion_yellow_raw"     # identical key and cut as in the pilaf: the scheduler may merge them
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 1.5, per_100g_min: 0.7 }
+    text:
+      brief:    { en: "Dice the onion.", tr: "Soğanı doğrayın." }
+      detailed: { en: "Dice {qty:onion_yellow_raw} of onion into pieces of about {len_cm:1}. Halve it, lay it flat, slice, then cut across.",
+                  tr: "{qty:onion_yellow_raw} soğanı yaklaşık {len_cm:1} boyutunda küpler halinde doğrayın. Yarıya bölüp düz tarafını tahtaya yatırın, dilimleyin, sonra çapraz kesin." }
+
+  - id: dice_carrot
+    op: dice
+    inputs: [carrot_raw]
+    outputs: [diced_carrot]
+    needs: []
+    batch_key: "dice:carrot_raw"
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 1, per_100g_min: 0.6 }
+    text:
+      brief:    { en: "Dice the carrot.", tr: "Havucu doğrayın." }
+      detailed: { en: "Peel {qty:carrot_raw} of carrots and dice them into pieces of about {len_cm:1}.",
+                  tr: "{qty:carrot_raw} havucu soyup yaklaşık {len_cm:1} büyüklüğünde küpler halinde doğrayın." }
+
+  - id: saute_veg
+    op: saute
+    inputs: [diced_onion, diced_carrot, tomato_paste, cumin_ground, olive_oil_extra_virgin]
+    outputs: [sauteed_base]
+    needs: [dice_onion, dice_carrot]
+    hold_max_min: 2
+    hold_kind: continuity
+    methods:
+      - id: pot
+        baseline: true
+        requires: [ { capability: heat_source, count: 1 }, { capability: pot, min_liters: 3 } ]
+        active: { fixed_min: 4, per_100g_min: 0.4 }
+    text:
+      brief:    { en: "Sauté the vegetables.", tr: "Sebzeleri kavurun." }
+      detailed: { en: "Heat the oil in a large pot. Cook the onion and carrot until soft, then stir in the tomato paste and cumin for a minute.",
+                  tr: "Büyük bir tencerede yağı ısıtın. Soğan ve havucu yumuşayana kadar kavurun, sonra salça ile kimyonu ekleyip bir dakika karıştırın." }
+
+  - id: simmer_lentils
+    op: simmer
+    inputs: [sauteed_base, rinsed_lentils, water_tap]
+    outputs: [cooked_lentil_soup]
+    needs: [saute_veg, rinse_lentils]
+    hold_max_min: 5                  # continuity: the purée step happens in the same pot
+    hold_kind: continuity
+    methods:
+      - id: stovetop
+        baseline: true
+        requires: [ { capability: heat_source, count: 1 }, { capability: pot, min_liters: 3 } ]
+        active: { fixed_min: 3 }
+        passive: { fixed_min: 25, scales: false }
+      - id: pressure_cooker
+        requires: [ { capability: pressure_cooker } ]
+        active: { fixed_min: 4 }
+        passive: { fixed_min: 10, scales: false }
+        quality: same
+        max_batch_g: 1800                      # never fill past half: lentils foam (illustrative capacity)
+        text:
+          brief:    { en: "Pressure-cook the soup.", tr: "Düdüklü tencerede pişirin." }
+          detailed: { en: "Move everything to the pressure cooker with {qty:water_tap} of water and lock the lid. Fill it no more than halfway, because lentils foam. Cook at high pressure, then release the pressure as your cooker's manual describes.",
+                      tr: "Her şeyi {qty:water_tap} suyla düdüklü tencereye aktarıp kapağını kilitleyin. Mercimek köpürdüğü için en fazla yarısına kadar doldurun. Yüksek basınçta pişirin, sonra basıncı düdüklü tencerenizin kullanım kılavuzunda anlatıldığı şekilde boşaltın." }
+    text:
+      brief:    { en: "Add lentils and simmer.", tr: "Mercimek ekleyip pişirin." }
+      detailed: { en: "Add the lentils and {qty:water_tap} of water. Bring to a boil, then simmer, skimming off the foam, until the lentils are completely soft.",
+                  tr: "Mercimeği ve {qty:water_tap} suyu ekleyin. Kaynayınca kısık ateşte, köpüğünü alarak mercimekler tamamen yumuşayana kadar pişirin." }
+
+  - id: puree_soup
+    op: blend
+    inputs: [cooked_lentil_soup]
+    outputs: [smooth_soup]
+    needs: [simmer_lentils]
+    methods:
+      - id: whisk
+        baseline: true                         # no special appliance needed
+        requires: []
+        active: { fixed_min: 4, per_100g_min: 0.3 }
+      - id: blender                            # covers hand (immersion) and jug blenders
+        requires: [ { capability: blender } ]
+        active: { fixed_min: 1.5, per_100g_min: 0.1 }
+        quality: better
+        text:
+          brief:    { en: "Blend the soup smooth.", tr: "Çorbayı blenderdan geçirin." }
+          detailed: { en: "Blend the soup with a hand blender right in the pot, or in batches in a jug blender. Be careful, it is hot.",
+                      tr: "Çorbayı tencerede el blenderi ile ya da parçalar halinde sürahi blenderla çekin. Sıcak olduğuna dikkat edin." }
+    text:
+      brief:    { en: "Mash the soup smooth.", tr: "Çorbayı ezerek pürüzsüzleştirin." }
+      detailed: { en: "Use a whisk or potato masher to break the lentils down until the soup is mostly smooth.",
+                  tr: "Mercimekleri bir çırpma teli veya patates ezici ile ezerek çorbayı büyük ölçüde pürüzsüz hale getirin." }
+
+  - id: season_soup
+    op: season
+    inputs: [smooth_soup, salt_table, pepper_black_ground]
+    outputs: [seasoned_soup]
+    needs: [puree_soup]
+    methods:
+      - id: spoon
+        baseline: true
+        requires: []
+        active: { fixed_min: 1 }
+    text:
+      brief:    { en: "Season the soup.", tr: "Çorbayı tuzlayın." }
+      detailed: { en: "Stir in the salt and pepper, taste, and adjust if needed.",
+                  tr: "Tuz ve karabiberi ekleyip karıştırın, tadına bakıp gerekirse ayarlayın." }
+
+  - id: portion_soup
+    op: portion
+    inputs: [seasoned_soup]
+    outputs: [portioned_soup]
+    needs: [season_soup]
+    methods:
+      - id: ladle
+        baseline: true
+        requires: []
+        active: { fixed_min: 3, per_100g_min: 0.1 }
+    text:
+      brief:    { en: "Ladle into containers.", tr: "Kaplara paylaştırın." }
+      detailed: { en: "Ladle the soup into shallow containers so it cools quickly, using the target weight the app shows for each one.",
+                  tr: "Çorbayı hızlı soğuması için sığ kaplara, uygulamanın gösterdiği hedef ağırlığa göre paylaştırın." }
+
+  - id: cool_soup
+    op: cool
+    inputs: [portioned_soup]
+    outputs: [cooled_soup]
+    needs: [portion_soup]
+    hold_max_min: 30
+    hold_kind: safety
+    on_hold_exceeded:
+      action: refrigerate
+      text: { en: "Put the containers in the fridge now, with the lids off until they are cool.",
+              tr: "Kapları hemen buzdolabına koyun; soğuyana kadar kapaklarını açık bırakın." }
+    methods:
+      - id: counter
+        baseline: true
+        requires: []
+        active: { fixed_min: 1 }
+        passive: { fixed_min: 25, scales: false }
+        passive_unattended: true
+    text:
+      brief:    { en: "Let it cool.", tr: "Soğumasını bekleyin." }
+      detailed: { en: "Leave the lids off and let the soup cool, stirring once. Refrigerate promptly.",
+                  tr: "Kapakları açık bırakıp çorbanın soğumasını bekleyin, bir kez karıştırın. Vakit kaybetmeden buzdolabına koyun." }
+
+  - id: store_soup
+    op: store
+    inputs: [cooled_soup]
+    outputs: [stored_soup]
+    needs: [cool_soup]
+    methods:
+      - id: containers
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+    text:
+      brief:    { en: "Refrigerate or freeze.", tr: "Buzdolabına veya dondurucuya koyun." }
+      detailed: { en: "Close the containers, label them, and put them in the fridge, or in the freezer for later.",
+                  tr: "Kapları kapatıp etiketleyin, buzdolabına ya da daha sonrası için dondurucuya koyun." }
+
+storage:
+  fridge_days: 4
+  freezer_days: 60
+  cooling_note:
+    en: "Cool in shallow containers and refrigerate promptly."
+    tr: "Sığ kaplarda soğutup vakit kaybetmeden buzdolabına koyun."
+  reheat:
+    en: "Reheat until steaming hot all the way through. Add water to loosen it if it has thickened."
+    tr: "Her yeri buharlaşacak kadar sıcak olana dek ısıtın. Koyulaştıysa açmak için su ekleyin."
+
+authoring:
+  author: "example"
+  reviewed_by: {}
+  reviewed_at: null

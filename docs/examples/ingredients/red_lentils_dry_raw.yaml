@@ -1,0 +1,19 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: red_lentils_dry_raw
+names: {en: 'Red lentils, dry', tr: 'Kırmızı mercimek, kuru'}
+aliases:
+  en: [red lentils, split red lentils]
+  tr: [kırmızı mercimek]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 352, protein_g: 24.6, fat_g: 1.1, carbs_g: 63.0, fiber_g: 10.8}
+allergens: []
+diet_flags: []
+shopping:
+  section: dry_goods
+  pack_sizes_g: [500, 1000]
+  staple: false
+edible_fraction: 1.0
+portion_step_g: 5

@@ -1,0 +1,19 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: salt_table
+names: {en: 'Salt, table', tr: 'Tuz, sofra tuzu'}
+aliases:
+  en: [salt]
+  tr: [tuz]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 0, protein_g: 0.0, fat_g: 0.0, carbs_g: 0.0, fiber_g: 0.0}
+allergens: []
+diet_flags: []
+shopping:
+  section: spices_oils
+  pack_sizes_g: [750]
+  staple: true
+edible_fraction: 1.0
+portion_step_g: 0.5

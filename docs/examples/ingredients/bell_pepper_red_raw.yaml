@@ -1,0 +1,22 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: bell_pepper_red_raw
+names: {en: 'Bell pepper, red, raw', tr: 'Kırmızı dolmalık biber, çiğ'}
+aliases:
+  en: [red bell pepper, red pepper, capsicum]
+  tr: [kırmızı dolmalık biber, kırmızı biber]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 31, protein_g: 1.0, fat_g: 0.3, carbs_g: 6.0, fiber_g: 2.1}
+unit_weights:
+- {unit: medium, grams: 120}
+yield: {cooked_state: roasted, mass_factor: 0.8}
+allergens: []
+diet_flags: []
+shopping:
+  section: produce
+  pack_sizes_g: []
+  staple: false
+edible_fraction: 0.82
+portion_step_g: 5

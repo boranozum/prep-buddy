@@ -1,0 +1,281 @@
+# EXAMPLE RECIPE A: Tavuklu pilav (chicken and rice pilaf), stovetop only.
+# Teaches: batch keys, a flex ingredient, an accelerator method (rice cooker) with its own text,
+#          safety / quality / continuity holds, vessel continuity, cooling and storage tasks.
+# Text placeholders: {qty:<ingredient_id>} scaled amount, {temp_c:N} temperature, {len_cm:N} length.
+# Never write a raw amount, temperature or length in text.
+schema_version: 1
+id: chicken_pilaf
+version: 1
+status: draft            # draft | in_review | published. Examples are never published.
+title: { en: "Chicken and rice pilaf", tr: "Tavuklu pilav" }
+description:
+  en: "One-pot chicken pilaf with onion. A stovetop staple that reheats well."
+  tr: "Soğanlı, tek tencerede tavuklu pilav. Ocakta yapılır ve yeniden ısıtmaya uygundur."
+base_servings: 4
+
+ingredients:
+  # portion_group: components weighed together at wrap-up. No group = part of the mix, never weighed alone.
+  - { ingredient_id: chicken_breast_raw,      grams: 600, role: main,      portion_group: pilaf }
+  - { ingredient_id: rice_white_long_raw,     grams: 240, role: flex,      portion_group: pilaf }
+  - { ingredient_id: onion_yellow_raw,        grams: 150, role: base,      portion_group: pilaf }
+  - { ingredient_id: olive_oil_extra_virgin,  grams: 20,  role: staple }
+  - { ingredient_id: salt_table,              grams: 6,   role: seasoning }
+  - { ingredient_id: pepper_black_ground,     grams: 2,   role: seasoning }
+  # `follows`: this quantity scales with another ingredient's factor (water follows the rice).
+  - { ingredient_id: water_tap,               grams: 500, role: staple,    follows: rice_white_long_raw }
+
+scaling:
+  min_factor: 0.75
+  max_factor: 1.5
+  flex:
+    - { ingredient_id: rice_white_long_raw, min_factor: 0.5, max_factor: 2.0 }
+
+tasks:
+  - id: wash_rice
+    op: wash
+    inputs: [rice_white_long_raw]
+    outputs: [washed_rice]
+    needs: []
+    methods:
+      - id: bowl
+        baseline: true
+        requires: []
+        active: { fixed_min: 1.5, per_100g_min: 0.2 }
+    text:
+      brief:    { en: "Rinse the rice.", tr: "Pirinci yıkayın." }
+      detailed: { en: "Rinse {qty:rice_white_long_raw} of rice in a bowl of cold water, swirling and draining until the water runs mostly clear.",
+                  tr: "{qty:rice_white_long_raw} pirinci soğuk suyla bir kasede çevirerek yıkayın; su neredeyse berraklaşana kadar süzüp tekrarlayın." }
+
+  - id: soak_rice
+    op: rest
+    inputs: [washed_rice]
+    outputs: [soaked_rice]
+    needs: [wash_rice]
+    methods:
+      - id: cover_with_water
+        baseline: true
+        requires: []
+        active: { fixed_min: 0.5 }
+        passive: { fixed_min: 15, scales: false }
+        passive_unattended: true
+    text:
+      brief:    { en: "Soak the rice.", tr: "Pirinci suda bekletin." }
+      detailed: { en: "Cover the rice with warm water and leave it to soak. Drain it well when the time is up.",
+                  tr: "Pirinci ılık suyla kaplayıp bekletin. Süre bitince suyunu iyice süzün." }
+
+  - id: dice_onion
+    op: dice
+    inputs: [onion_yellow_raw]
+    outputs: [diced_onion]
+    needs: []
+    batch_key: "dice:onion_yellow_raw"     # same key in other recipes means "same cut": may be merged
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 1.5, per_100g_min: 0.7 }
+    text:
+      brief:    { en: "Dice the onion.", tr: "Soğanı doğrayın." }
+      detailed: { en: "Dice {qty:onion_yellow_raw} of onion into pieces of about {len_cm:1}. Halve it, lay it flat, slice, then cut across.",
+                  tr: "{qty:onion_yellow_raw} soğanı yaklaşık {len_cm:1} boyutunda küpler halinde doğrayın. Yarıya bölüp düz tarafını tahtaya yatırın, dilimleyin, sonra çapraz kesin." }
+
+  - id: dice_chicken
+    op: dice
+    inputs: [chicken_breast_raw]
+    outputs: [cubed_chicken]
+    needs: []
+    batch_key: "dice:chicken_breast_raw"
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 2, per_100g_min: 0.5 }
+    text:
+      brief:    { en: "Cube the chicken.", tr: "Tavuğu küp küp doğrayın." }
+      detailed: { en: "Trim any fat and cut {qty:chicken_breast_raw} of chicken into cubes of about {len_cm:2}. Wash your hands, the board and the knife afterwards.",
+                  tr: "{qty:chicken_breast_raw} tavuğun yağlarını ayıklayıp yaklaşık {len_cm:2} büyüklüğünde küpler halinde kesin. Sonrasında ellerinizi, tahtayı ve bıçağı yıkayın." }
+
+  - id: season_chicken
+    op: season
+    inputs: [cubed_chicken, salt_table, pepper_black_ground]
+    outputs: [seasoned_chicken]
+    needs: [dice_chicken]
+    methods:
+      - id: bowl
+        baseline: true
+        requires: []
+        active: { fixed_min: 1 }
+    text:
+      brief:    { en: "Season the chicken.", tr: "Tavuğu baharatlayın." }
+      detailed: { en: "Toss the chicken with half of the salt and all of the pepper in a bowl.",
+                  tr: "Tavuğu tuzun yarısı ve karabiberin tamamıyla bir kasede karıştırın." }
+
+  - id: sear_chicken
+    op: sear
+    inputs: [seasoned_chicken, olive_oil_extra_virgin]
+    outputs: [seared_chicken]
+    needs: [season_chicken]
+    hold_max_min: 20                 # partly cooked chicken must not wait long
+    hold_kind: safety
+    on_hold_exceeded:
+      action: refrigerate
+      text: { en: "Put the seared chicken in the fridge until you are ready to continue.",
+              tr: "Mühürlenmiş tavuğu devam etmeye hazır olana kadar buzdolabına koyun." }
+    methods:
+      - id: pan
+        baseline: true
+        requires: [ { capability: heat_source, count: 1 }, { capability: pan } ]
+        active: { fixed_min: 3, per_100g_min: 0.8 }
+    text:
+      brief:    { en: "Sear the chicken.", tr: "Tavuğu mühürleyin." }
+      detailed: { en: "Heat half of the oil in a wide pan over medium-high heat. Sear the chicken, stirring now and then, until browned on all sides. It does not need to be cooked through.",
+                  tr: "Geniş bir tavada yağın yarısını orta-yüksek ateşte ısıtın. Tavuğu ara sıra karıştırarak her yanı kızarana kadar mühürleyin; içinin pişmesi gerekmiyor." }
+
+  - id: saute_onion
+    op: saute
+    inputs: [diced_onion, olive_oil_extra_virgin]
+    outputs: [sauteed_onion]
+    needs: [dice_onion]
+    hold_max_min: 2                  # continuity: the next step happens in the same pot
+    hold_kind: continuity
+    methods:
+      - id: pot
+        baseline: true
+        requires: [ { capability: heat_source, count: 1 }, { capability: pot, min_liters: 3 } ]
+        active: { fixed_min: 2, per_100g_min: 1.0 }
+    text:
+      brief:    { en: "Sauté the onion.", tr: "Soğanı kavurun." }
+      detailed: { en: "In a medium pot over medium heat, cook the onion in the remaining oil until soft and translucent.",
+                  tr: "Orta boy bir tencerede kalan yağ ile soğanı orta ateşte yumuşayıp saydamlaşana kadar kavurun." }
+
+  - id: toast_rice
+    op: saute
+    inputs: [soaked_rice, sauteed_onion, salt_table]
+    outputs: [toasted_rice]
+    needs: [soak_rice, saute_onion]
+    hold_max_min: 2
+    hold_kind: continuity
+    methods:
+      - id: pot
+        baseline: true
+        requires: [ { capability: heat_source, count: 1 }, { capability: pot, min_liters: 3 } ]
+        active: { fixed_min: 2 }
+    text:
+      brief:    { en: "Toast the rice.", tr: "Pirinci kavurun." }
+      detailed: { en: "Drain the rice, add it to the onion with the remaining salt, and stir for a couple of minutes until the grains turn glossy.",
+                  tr: "Pirincin suyunu süzüp soğanın üzerine ekleyin, kalan tuzu ilave edip taneler parlaklaşana kadar birkaç dakika karıştırın." }
+
+  - id: simmer_pilaf
+    op: simmer
+    inputs: [toasted_rice, seared_chicken, water_tap]
+    outputs: [cooked_pilaf]
+    needs: [toast_rice, sear_chicken]
+    hold_max_min: 10                 # quality: fluff soon after resting
+    hold_kind: quality
+    methods:
+      - id: stovetop
+        baseline: true
+        requires: [ { capability: heat_source, count: 1 }, { capability: pot, min_liters: 3 } ]
+        active: { fixed_min: 3 }
+        # 15 min simmer + 10 min covered rest, kept as ONE task on purpose (see guide, "vessel continuity").
+        passive: { fixed_min: 25, scales: false }
+      - id: rice_cooker
+        requires: [ { capability: rice_cooker } ]
+        active: { fixed_min: 4 }               # transfer and start the cycle
+        passive: { fixed_min: 35, scales: false }
+        passive_unattended: true               # frees the burner AND your attention
+        quality: better
+        max_batch_g: 2500                      # capacity of a typical cooker (illustrative)
+        text:                                  # different physical steps: the method carries its own text
+          brief:    { en: "Cook it in the rice cooker.", tr: "Pirinç pişirici ile pişirin." }
+          detailed: { en: "Move everything to the rice cooker with {qty:water_tap} of water, stir, and start the normal cooking cycle. Keep it warm for the resting time.",
+                      tr: "Her şeyi {qty:water_tap} suyla birlikte pirinç pişiricisine aktarın, karıştırın ve normal pişirme programını başlatın. Dinlenme süresi boyunca sıcak tutma modunda bırakın." }
+    text:
+      brief:    { en: "Add water and simmer.", tr: "Su ekleyip pişirin." }
+      detailed: { en: "Stir the chicken into the pot, add {qty:water_tap} of hot water, and bring to a boil. Cover, reduce to low, and cook until the water is absorbed, then leave it covered off the heat to rest.",
+                  tr: "Tavuğu tencereye ekleyin, {qty:water_tap} sıcak su ilave edip kaynatın. Kapağını kapatıp ateşi kısın; su çekilince ocaktan alıp kapalı şekilde dinlendirin." }
+
+  - id: fluff_pilaf
+    op: mix
+    inputs: [cooked_pilaf]
+    outputs: [fluffed_pilaf]
+    needs: [simmer_pilaf]
+    hold_max_min: 5
+    hold_kind: quality
+    methods:
+      - id: fork
+        baseline: true
+        requires: []
+        active: { fixed_min: 1.5 }
+    text:
+      brief:    { en: "Fluff the pilaf.", tr: "Pilavı gevşetin." }
+      detailed: { en: "Uncover and gently fluff with a fork, folding the chicken through the rice.",
+                  tr: "Kapağı açıp bir çatalla nazikçe karıştırarak tavukları pilavla harmanlayın." }
+
+  - id: spread_to_cool
+    op: cool
+    inputs: [fluffed_pilaf]
+    outputs: [cooled_pilaf]
+    needs: [fluff_pilaf]
+    hold_max_min: 15                 # cooked rice must not sit at room temperature
+    hold_kind: safety
+    on_hold_exceeded:
+      action: refrigerate
+      text: { en: "Put the trays in the fridge now, and portion the pilaf when you are ready.",
+              tr: "Tepsileri hemen buzdolabına koyun, hazır olunca pilavı porsiyonlayın." }
+    methods:
+      - id: shallow_trays
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+        passive: { fixed_min: 20, scales: false }
+        passive_unattended: true
+    text:
+      brief:    { en: "Spread out to cool.", tr: "Soğuması için yayın." }
+      detailed: { en: "Spread the pilaf in a thin layer on a tray or wide dish so it cools quickly.",
+                  tr: "Pilavı hızlı soğuması için tepsi veya geniş bir kaba ince bir tabaka halinde yayın." }
+
+  - id: portion_pilaf
+    op: portion
+    inputs: [cooled_pilaf]
+    outputs: [portioned_pilaf]
+    needs: [spread_to_cool]
+    methods:
+      - id: scale
+        baseline: true
+        requires: []
+        active: { fixed_min: 3, per_100g_min: 0.15 }
+    text:
+      brief:    { en: "Portion into containers.", tr: "Kaplara porsiyonlayın." }
+      detailed: { en: "Divide the pilaf evenly into containers, using the target weight the app shows for each one.",
+                  tr: "Pilavı, uygulamanın gösterdiği hedef ağırlığa göre kaplara eşit olarak paylaştırın." }
+
+  - id: store_pilaf
+    op: store
+    inputs: [portioned_pilaf]
+    outputs: [stored_pilaf]
+    needs: [portion_pilaf]
+    methods:
+      - id: containers
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+    text:
+      brief:    { en: "Refrigerate or freeze.", tr: "Buzdolabına veya dondurucuya koyun." }
+      detailed: { en: "Close the containers, label them, and put them in the fridge, or in the freezer for later.",
+                  tr: "Kapları kapatıp etiketleyin, buzdolabına ya da daha sonrası için dondurucuya koyun." }
+
+storage:
+  fridge_days: 3
+  freezer_days: 30
+  cooling_note:
+    en: "Cool quickly and refrigerate promptly. Do not leave cooked rice at room temperature."
+    tr: "Hızlıca soğutup vakit kaybetmeden buzdolabına koyun. Pişmiş pirinci oda sıcaklığında bekletmeyin."
+  reheat:
+    en: "Reheat until steaming hot all the way through. Add a splash of water if it is dry."
+    tr: "Her yeri buharlaşacak kadar sıcak olana dek ısıtın. Kuruysa biraz su ekleyin."
+
+authoring:
+  author: "example"
+  reviewed_by: {}          # locale -> reviewer. Publishing requires an entry for every required locale.
+  reviewed_at: null

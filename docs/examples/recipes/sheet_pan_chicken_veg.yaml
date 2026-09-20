@@ -1,0 +1,255 @@
+# EXAMPLE RECIPE C: Sheet-pan chicken and vegetables (oven at 200 C).
+# Teaches: oven requirements (temperature, tolerance, trays), a roast task split from its take-out task,
+#          an air-fryer accelerator with a capacity limit, a batch key that must NOT merge (different cut),
+#          a recipe that is hidden from users without an oven, and a recipe that cannot be frozen.
+schema_version: 1
+id: sheet_pan_chicken_veg
+version: 1
+status: draft
+title: { en: "Sheet-pan chicken and vegetables", tr: "Fırın tepsisinde tavuk ve sebze" }
+description:
+  en: "Paprika chicken thighs roasted on a tray with potatoes, peppers and onion."
+  tr: "Patates, biber ve soğanla birlikte tepside fırınlanan paprikalı tavuk but."
+base_servings: 4
+
+ingredients:
+  - { ingredient_id: chicken_thigh_boneless_skinless_raw, grams: 800, role: main, portion_group: chicken }
+  - { ingredient_id: potato_raw,             grams: 600, role: flex, portion_group: veg }
+  - { ingredient_id: bell_pepper_red_raw,    grams: 300, role: base, portion_group: veg }
+  - { ingredient_id: onion_yellow_raw,       grams: 200, role: base, portion_group: veg }
+  - { ingredient_id: olive_oil_extra_virgin, grams: 30,  role: staple }
+  - { ingredient_id: paprika_ground,         grams: 4,   role: seasoning }
+  - { ingredient_id: salt_table,             grams: 6,   role: seasoning }
+  - { ingredient_id: pepper_black_ground,    grams: 2,   role: seasoning }
+
+scaling:
+  min_factor: 0.75
+  max_factor: 1.5
+  flex:
+    - { ingredient_id: potato_raw, min_factor: 0.5, max_factor: 2.0 }
+
+tasks:
+  - id: cube_potato
+    op: dice
+    inputs: [potato_raw]
+    outputs: [cubed_potato]
+    needs: []
+    batch_key: "dice:potato_raw"
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 2, per_100g_min: 0.6 }
+    text:
+      brief:    { en: "Cube the potatoes.", tr: "Patatesleri küp küp doğrayın." }
+      detailed: { en: "Scrub or peel {qty:potato_raw} of potatoes and cut them into cubes of about {len_cm:2}. Keep the pieces even so they cook at the same speed.",
+                  tr: "{qty:potato_raw} patatesi fırçalayın ya da soyun, eşit pişmeleri için yaklaşık {len_cm:2} büyüklüğünde eşit küpler halinde doğrayın." }
+
+  - id: slice_pepper
+    op: slice
+    inputs: [bell_pepper_red_raw]
+    outputs: [sliced_pepper]
+    needs: []
+    batch_key: "slice:bell_pepper_red_raw"
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 1, per_100g_min: 0.5 }
+    text:
+      brief:    { en: "Slice the pepper.", tr: "Biberi dilimleyin." }
+      detailed: { en: "Remove the seeds and slice {qty:bell_pepper_red_raw} of pepper into strips about {len_cm:2} wide.",
+                  tr: "{qty:bell_pepper_red_raw} biberin çekirdeklerini çıkarıp yaklaşık {len_cm:2} genişliğinde şeritler halinde dilimleyin." }
+
+  - id: slice_onion
+    op: slice
+    inputs: [onion_yellow_raw]
+    outputs: [onion_wedges]
+    needs: []
+    batch_key: "slice:onion_yellow_raw"     # a DIFFERENT cut from dice:onion, so it never merges with the pilaf's onion
+    methods:
+      - id: knife
+        baseline: true
+        requires: []
+        active: { fixed_min: 1, per_100g_min: 0.5 }
+    text:
+      brief:    { en: "Cut the onion into wedges.", tr: "Soğanı dilimleyin." }
+      detailed: { en: "Cut {qty:onion_yellow_raw} of onion into thick wedges.",
+                  tr: "{qty:onion_yellow_raw} soğanı kalın dilimler halinde kesin." }
+
+  - id: season_chicken
+    op: marinate
+    inputs: [chicken_thigh_boneless_skinless_raw, olive_oil_extra_virgin, paprika_ground, salt_table, pepper_black_ground]
+    outputs: [seasoned_chicken]
+    needs: []
+    methods:
+      - id: bowl
+        baseline: true
+        requires: []
+        active: { fixed_min: 2, per_100g_min: 0.2 }
+    text:
+      brief:    { en: "Season the chicken.", tr: "Tavuğu baharatlayın." }
+      detailed: { en: "Toss the chicken with half of the oil, half of the paprika, and half of the salt and pepper. It can marinate while you prepare the vegetables.",
+                  tr: "Tavuğu yağın, paprikanın, tuz ve karabiberin yarısıyla karıştırın. Sebzeleri hazırlarken marine olabilir." }
+
+  - id: toss_veg
+    op: mix
+    inputs: [cubed_potato, sliced_pepper, onion_wedges, olive_oil_extra_virgin, paprika_ground, salt_table, pepper_black_ground]
+    outputs: [seasoned_veg]
+    needs: [cube_potato, slice_pepper, slice_onion]
+    methods:
+      - id: tray
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+    text:
+      brief:    { en: "Season the vegetables.", tr: "Sebzeleri baharatlayın." }
+      detailed: { en: "Toss the vegetables with the remaining oil, paprika, salt and pepper, and spread them on a lined tray.",
+                  tr: "Sebzeleri kalan yağ, paprika, tuz ve karabiberle karıştırıp kağıt serili bir tepsiye yayın." }
+
+  - id: roast_veg
+    op: roast
+    inputs: [seasoned_veg]
+    outputs: [roasted_veg]
+    needs: [toss_veg]
+    hold_max_min: 15                 # quality: do not leave them to dry out in the oven
+    hold_kind: quality
+    methods:
+      - id: oven
+        baseline: true
+        requires: [ { capability: oven, temp_c: 200, tolerance_c: 15, trays: 1 } ]
+        active: { fixed_min: 1.5 }                          # load the tray
+        passive: { fixed_min: 40, scales: false }           # 4 trays take as long as 1 (up to tray capacity)
+        passive_unattended: true
+    text:
+      brief:    { en: "Roast the vegetables.", tr: "Sebzeleri fırında kızartın." }
+      detailed: { en: "Put the tray in the oven at {temp_c:200}. Roast until the potatoes are golden and tender.",
+                  tr: "Tepsiyi {temp_c:200} sıcaklıktaki fırına verin. Patatesler altın renginde ve yumuşak olana kadar pişirin." }
+
+  - id: roast_chicken
+    op: roast
+    inputs: [seasoned_chicken]
+    outputs: [roasted_chicken]
+    needs: [season_chicken]
+    hold_max_min: 15
+    hold_kind: quality
+    methods:
+      - id: oven
+        baseline: true
+        requires: [ { capability: oven, temp_c: 200, tolerance_c: 15, trays: 1 } ]
+        active: { fixed_min: 1.5 }
+        passive: { fixed_min: 32, scales: false }
+        passive_unattended: true
+      - id: air_fryer
+        requires: [ { capability: air_fryer } ]
+        active: { fixed_min: 2 }
+        passive: { fixed_min: 22, scales: false }
+        passive_unattended: true
+        quality: same
+        max_batch_g: 1200                      # a method whose capacity is below the task's mass is unavailable
+        text:
+          brief:    { en: "Air-fry the chicken.", tr: "Tavuğu airfryerda pişirin." }
+          detailed: { en: "Place the chicken in the air fryer basket in a single layer and cook at {temp_c:190}.",
+                      tr: "Tavuğu airfryer sepetine tek kat halinde dizip {temp_c:190} sıcaklıkta pişirin." }
+    text:
+      brief:    { en: "Roast the chicken.", tr: "Tavuğu fırında pişirin." }
+      detailed: { en: "Arrange the chicken on a second tray and roast at {temp_c:200} until golden.",
+                  tr: "Tavuğu ikinci bir tepsiye dizip {temp_c:200} sıcaklıktaki fırında altın rengini alana kadar pişirin." }
+
+  - id: unload_veg
+    op: unload
+    inputs: [roasted_veg]
+    outputs: [cooked_veg]
+    needs: [roast_veg]
+    methods:
+      - id: gloves
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+    text:
+      brief:    { en: "Take out the vegetables.", tr: "Sebzeleri fırından çıkarın." }
+      detailed: { en: "Take the tray out with oven gloves and check that the potatoes are tender.",
+                  tr: "Tepsiyi fırın eldiveniyle çıkarın ve patateslerin yumuşadığını kontrol edin." }
+
+  - id: unload_chicken
+    op: unload
+    inputs: [roasted_chicken]
+    outputs: [cooked_chicken]
+    needs: [roast_chicken]
+    methods:
+      - id: gloves
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+    text:
+      brief:    { en: "Take out the chicken.", tr: "Tavuğu fırından çıkarın." }
+      detailed: { en: "Take the tray out and check that the thickest piece reaches {temp_c:74} inside and the juices run clear.",
+                  tr: "Tepsiyi çıkarıp en kalın parçanın içinin {temp_c:74} sıcaklığa ulaştığını ve suyunun berrak aktığını kontrol edin." }
+
+  - id: spread_to_cool
+    op: cool
+    inputs: [cooked_veg, cooked_chicken]
+    outputs: [cooled_tray]
+    needs: [unload_veg, unload_chicken]
+    hold_max_min: 15
+    hold_kind: safety
+    on_hold_exceeded:
+      action: refrigerate
+      text: { en: "Put everything in the fridge now and portion it when you are ready.",
+              tr: "Her şeyi hemen buzdolabına koyun, hazır olunca porsiyonlayın." }
+    methods:
+      - id: trays
+        baseline: true
+        requires: []
+        active: { fixed_min: 2 }
+        passive: { fixed_min: 20, scales: false }
+        passive_unattended: true
+    text:
+      brief:    { en: "Let it cool.", tr: "Soğumasını bekleyin." }
+      detailed: { en: "Leave everything spread out on the trays to cool for a few minutes.",
+                  tr: "Her şeyi tepsilerde yayılmış halde birkaç dakika soğumaya bırakın." }
+
+  - id: portion_trays
+    op: portion
+    inputs: [cooled_tray]
+    outputs: [portioned_trays]
+    needs: [spread_to_cool]
+    methods:
+      - id: scale
+        baseline: true
+        requires: []
+        active: { fixed_min: 4, per_100g_min: 0.15 }
+    text:
+      brief:    { en: "Portion into containers.", tr: "Kaplara porsiyonlayın." }
+      detailed: { en: "Divide the chicken and vegetables into containers, using the target weights the app shows for each one.",
+                  tr: "Tavuğu ve sebzeleri, uygulamanın gösterdiği hedef ağırlıklara göre kaplara paylaştırın." }
+
+  - id: store_trays
+    op: store
+    inputs: [portioned_trays]
+    outputs: [stored_trays]
+    needs: [portion_trays]
+    methods:
+      - id: containers
+        baseline: true
+        requires: []
+        active: { fixed_min: 3 }
+    text:
+      brief:    { en: "Refrigerate.", tr: "Buzdolabına koyun." }
+      detailed: { en: "Close the containers, label them, and put them in the fridge.",
+                  tr: "Kapları kapatıp etiketleyin ve buzdolabına koyun." }
+
+storage:
+  fridge_days: 3
+  freezer_days: null          # null = not recommended (roasted potatoes freeze poorly)
+  cooling_note:
+    en: "Cool quickly and refrigerate promptly."
+    tr: "Hızlıca soğutup vakit kaybetmeden buzdolabına koyun."
+  reheat:
+    en: "Reheat in the oven or a pan until steaming hot all the way through."
+    tr: "Fırında ya da tavada her yeri buharlaşacak kadar sıcak olana dek ısıtın."
+
+authoring:
+  author: "example"
+  reviewed_by: {}
+  reviewed_at: null

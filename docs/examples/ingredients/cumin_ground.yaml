@@ -1,0 +1,20 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: cumin_ground
+names: {en: 'Cumin, ground', tr: 'Kimyon, toz'}
+aliases:
+  en: [cumin, ground cumin]
+  tr: [kimyon]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 375, protein_g: 17.8, fat_g: 22.3, carbs_g: 44.2, fiber_g: 10.5}
+allergens: []
+diet_flags: []
+shopping:
+  section: spices_oils
+  pack_sizes_g: [50]
+  staple: true
+edible_fraction: 1.0
+portion_step_g: 0.5
+validation: {kcal_check: exempt, reason: high-fiber spice with volatile oils}

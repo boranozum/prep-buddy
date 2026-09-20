@@ -1,0 +1,21 @@
+# EXAMPLE DATA. Nutrition values are ILLUSTRATIVE ROUND NUMBERS, not USDA data.
+# `source.dataset: example_placeholder` is rejected by CI inside data/. Replace with real,
+# reviewed USDA snapshot values (with fdc_id) before using any of this in the library.
+schema_version: 1
+id: pepper_black_ground
+names: {en: 'Black pepper, ground', tr: 'Karabiber, toz'}
+aliases:
+  en: [black pepper]
+  tr: [karabiber]
+source: {dataset: example_placeholder, fdc_id: null, snapshot_date: null}
+per_100g: {kcal: 251, protein_g: 10.4, fat_g: 3.3, carbs_g: 64.0, fiber_g: 25.3}
+allergens: []
+diet_flags: []
+shopping:
+  section: spices_oils
+  pack_sizes_g: [50]
+  staple: true
+edible_fraction: 1.0
+portion_step_g: 0.5
+validation: {kcal_check: exempt, reason: high-fiber spice; carbohydrate figure is mostly indigestible
+    fiber}
