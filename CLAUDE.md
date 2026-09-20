@@ -6,7 +6,7 @@ Guidance for Claude Code working in the Prep Buddy repository. Keep this file sh
 
 Prep Buddy is a mobile app that acts as a cooking coach for **batch meal prep**. The user picks several recipes, and the app computes **one optimized cooking session** (what to batch, what to start first, what to do while something roasts) and walks them through it step by step, with timers, until everything is cooked, portioned and stored. It also handles calorie and macro targets, allergies, a shopping list and simple tracking.
 
-**Current milestone:** M0 (see `docs/implementation-plan.md`). Update this line as milestones complete.
+**Current milestone:** M1 (see `docs/implementation-plan.md`). M0 (foundations: monorepo, CI, schema codegen) is done. Update this line as milestones complete.
 
 ## Read first
 
