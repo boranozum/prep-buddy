@@ -8,15 +8,16 @@ This package is the complete product and engineering specification for Prep Budd
 |---|---|---|
 | 1 | `../CLAUDE.md` | Rules, layout and conventions Claude Code reads every session |
 | 2 | `PRD.md` | Problem, scope, principles, non-goals, metrics, decision log |
-| 3 | `implementation-plan.md` | Milestones M0-M9, acceptance tests, decision gates (riskiest first) |
+| 3 | `implementation-plan.md` | Milestones M0-M9, the design track D0-D3, acceptance tests, decision gates (riskiest first) |
 | 4 | `data-model.md` | Schemas and entities (v0.2, consolidated) |
 | 5 | `scheduler-spec.md` | Expansion, batching, CP-SAT model, verifier, greedy, repair, speed estimator |
 | 6 | `planning-spec.md` | Targets, safety rails, filtering, scaling, shopping list, tracking |
 | 7 | `cook-mode-spec.md` | State machine, timers and notifications, one-tap timing capture, wrap-up |
 | 8 | `recipe-authoring-guide.md` | How recipes are authored and reviewed |
 | 9 | `examples/` | 3 worked recipes, 15 ingredients, prototype validator (`python3 validate_examples.py`, needs `pip install pyyaml`) |
+| 10 | `design/` | Design brief, tokens, wireframes and prototypes. Created by the design track (D0-D2) |
 
-`decisions/` (ADRs) and `reports/` (gate reports, sign-offs) start empty.
+`decisions/` (ADRs) and `reports/` (gate reports, sign-offs, the D1 kitchen test) start empty.
 
 ## Starting Claude Code
 
@@ -24,7 +25,7 @@ From the repo root, a good first prompt is:
 
 > Read `CLAUDE.md`, `docs/PRD.md` and `docs/implementation-plan.md`. Then implement milestone M0 following the plan, reading `docs/data-model.md` for the schema work. Stop and ask if anything in the specs is ambiguous or contradictory.
 
-Continue one milestone at a time. Gate G1 (the scheduler claim check, end of M3) is a real decision point, so review it before building the app.
+Continue one milestone at a time. Gate G1 (the scheduler claim check, end of M3) is a real decision point, so review it before building the app. The design system (D2) must be finished before M5 starts.
 
 ## Status and things that need humans
 

@@ -1,7 +1,7 @@
 # Prep Buddy: Product Requirements Document
 
 Status: DRAFT v0.1 (for review). Lives at `docs/PRD.md`.
-Companion docs: `docs/data-model.md`, `docs/scheduler-spec.md`, `docs/planning-spec.md`, `docs/cook-mode-spec.md`, `docs/recipe-authoring-guide.md` (with `docs/examples/`), `docs/implementation-plan.md`, and `CLAUDE.md` at the repo root.
+Companion docs: `docs/data-model.md`, `docs/scheduler-spec.md`, `docs/planning-spec.md`, `docs/cook-mode-spec.md`, `docs/recipe-authoring-guide.md` (with `docs/examples/`), `docs/implementation-plan.md`, `docs/design/` (created by the design track), and `CLAUDE.md` at the repo root.
 
 ---
 
@@ -154,3 +154,4 @@ Claude Code must **not** build any of the following during the MVP: auto-generat
 | 11 | No-targets mode | Available to adults by choice and in the health-gate case (with manual targets as the other option); under-18 stays blocked |
 | 12 | Metrics | Opt-in anonymous allowlisted metrics (off by default), random resettable install ID, separate ingestion service, manual export during beta |
 | 13 | Build order | Riskiest-first: schemas, recipe validation and the scheduler (with a plan viewer) are built and gated before any mobile UI |
+| 14 | Design track | Design runs in parallel (D0-D3): cook mode is designed and kitchen-tested first, the design system is complete before the app is built (M5), and UI code uses shared tokens and components |

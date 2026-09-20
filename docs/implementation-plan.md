@@ -11,7 +11,7 @@ The product's whole promise is that a computed plan makes a 3-4 hour batch cook 
 
 - Milestones M0-M3 produce the schemas, the recipe pipeline, the scheduler and the solver, ending in a written **decision gate (G1)** on the core claim.
 - M4-M7 build the planning layer and the app on top of a proven engine.
-- Two parallel tracks run alongside: **content** (ingredients and recipes) and **compliance** (dietitian, food safety, language, legal and privacy reviews). They have long lead times and start early.
+- Three parallel tracks run alongside: **design**, **content** (ingredients and recipes) and **compliance** (dietitian, food safety, language, legal and privacy reviews). They have long lead times and start early.
 
 Sizes below are relative (S, M, L), not calendar estimates, because they depend on team size.
 
@@ -29,11 +29,13 @@ Sizes below are relative (S, M, L), not calendar estimates, because they depend 
 | M7 | Wrap-up, tracking, metrics | M | Containers, log, estimator, opt-in metrics, export/import |
 | M8 | Content and compliance track | L, parallel | Library published, sign-offs recorded |
 | M9 | Beta and launch | M | Private beta results, **Gate G3: launch readiness** |
+| D0-D3 | Design track | M, parallel | Design system before M5, cook mode kitchen-tested (D1) |
 
 ```
 M0 -> M1 -> M2 -> M3 --G1--> M4 -> M5 -> M6 --G2--> M7 -> M9 --G3--> launch
         \                     ^
          \--> M8 (content and compliance, parallel, needed by M4 tests and M9)
+ D0 -> D1 (during M3) -> D2 (before M5) -> D3 (during M5-M7)   design track, parallel
 ```
 
 ## 3. Ground rules for every milestone
@@ -156,8 +158,10 @@ Implements `docs/planning-spec.md` in `packages/core`, pure and tested, with no 
 
 ## 9. M5: Mobile foundation (L)
 
+**Prerequisite:** design stage D2 is complete (`docs/design/` tokens, components and screens).
+
 **Tasks**
-1. Expo app shell, navigation, theming (light and dark), design system with the tone guard baked into components.
+1. Expo app shell, navigation, theming (light and dark) built from `docs/design/tokens.json`, and shared components with the tone guard baked in.
 2. i18n with `en` and `tr` UI strings, pseudo-locale for testing, locale-aware formatting.
 3. Persistence: SQLite with migrations for profile, sessions, records, logs, containers, weights, pantry. Versioned **export and import** of all user data, with `applyRails` re-run on import.
 4. Onboarding: language and units, target mode (computed, manual, none) with the health gate and adult check, body stats, goal, allergies and diet, equipment, experience level, optional baseline session length.
@@ -192,6 +196,7 @@ Implements `docs/cook-mode-spec.md` and the repair algorithm in `packages/core`.
 - Notification scheduling tests with a mocked API.
 - **Gate G2, real-device protocol** (recorded in `docs/reports/g2-devices.md`): lock-phone timers of 30 and 90 minutes on at least 2 iOS and 3 Android devices (including two Android vendors), with silent mode, Do Not Disturb or Focus, low power mode, and after a reboot. Any device where a timer fails to alert is documented with the mitigation (or the milestone doesn't pass).
 - **Dogfooding:** the team cooks at least 3 complete real sessions with the app. Planned vs. actual times are compared against the G1 numbers, and problems are filed.
+- The findings of the **D1 kitchen test** (design track) are reviewed, and each is resolved or explicitly deferred.
 
 ## 11. M7: Wrap-up, tracking and metrics (M)
 
@@ -225,7 +230,33 @@ Implements `docs/cook-mode-spec.md` and the repair algorithm in `packages/core`.
 
 **Acceptance:** the launch library is published with all reviewers recorded, and written sign-offs are stored in `docs/reports/`.
 
-## 13. M9: Beta and launch (M)
+## 13. Design track (parallel)
+
+The specs define behavior, not appearance or layout. Design runs alongside engineering so the riskiest screen is tested early and the design system exists before the app is built.
+
+**Riskiest design first.** Cook mode has to work with wet hands, at arm's length, with several timers running and the "waiting" and "I'm behind" states. It can be prototyped long before code exists, and changes are cheapest now. Conventional screens (onboarding, library, shopping list) wait.
+
+| Stage | When | Deliverables | Exit criteria |
+|---|---|---|---|
+| **D0** | Alongside M0-M2 | `docs/design/design-brief.md`: visual direction, tone, accessibility principles, spec constraints (below). Rough cook-mode wireframes for every state | Brief approved. Wireframes cover mise en place, the current-step card, the waiting card, the "while you wait" lane, the alarm surface, the "I'm behind" sheet, result and fallback screens, pause, welcome-back, hold-exceeded, and the weigh-the-batch step |
+| **D1** | During M3, once the plan viewer exists | A clickable cook-mode prototype that runs on a phone, driven by a real plan from the viewer. **Kitchen test:** cook one real multi-recipe session following the prototype | Findings in `docs/reports/d1-kitchen-test.md`: missed taps, glanceability, confusing moments, timer and alarm behavior. Any change to `docs/cook-mode-spec.md` is proposed, approved and made explicitly |
+| **D2** | Finished **before M5 starts** | Design system: color tokens with contrast ratios, type scale that survives 200% text scaling, spacing, core components, light and dark themes, Turkish long-string test screens, `docs/design/tokens.json`. Screens: onboarding, session builder, library, plan review, shopping list, consent, tone-guard copy samples | Design review checklist passed (accessibility, both locales, both orientations for cook mode) |
+| **D3** | During M5-M7 | Wrap-up, containers, tracking and weight views, empty and error states, app icon and store assets | Reviewed against the same checklist |
+
+**Constraints every design must respect** (from the specs):
+- One primary action per screen. The **Done** button is full width, anchored at the bottom, at least 72 dp high, and never scrolls out of view.
+- Bottom-anchored actions and undo instead of confirmation dialogs.
+- Neutral tone: no red for lateness or exceeding a target, no streaks, no shaming, no celebration of extreme targets (planning spec, tone guard).
+- Color is never the only cue. Recipe badges combine a letter and a shape.
+- Layouts work at 200% OS text size, in portrait and landscape for cook mode, in English and in Turkish (strings up to 30-40% longer).
+- Contrast at WCAG AA or better, checked in bright light, with a dark theme.
+- Hidden calorie and macro figures in `none` mode, so every screen with nutrition data needs a variant without it.
+
+**Where it lives.** `docs/design/` (brief, tokens, wireframes, prototypes). Prototypes can be interactive HTML pages, and a design tool is optional. `tokens.json` is the machine-readable source for the mobile theme, so code and design cannot drift.
+
+**Rule for Claude Code.** UI code uses tokens and shared components from the design system. It does not invent colors, sizes, spacing or strings. If a needed design is missing, it asks.
+
+## 14. M9: Beta and launch (M)
 
 **Tasks**
 1. Deploy the solver and ingestion services per the M3 ADR: monitoring, alerting, rate limits, and client attestation or the chosen abuse protection.
@@ -235,7 +266,7 @@ Implements `docs/cook-mode-spec.md` and the repair algorithm in `packages/core`.
 
 **Acceptance and Gate G3 (launch readiness):** all compliance sign-offs present, G1 and G2 outcomes recorded, beta results reviewed against the PRD metrics and guardrails (zero allergen violations, zero verifier failures reaching users, no target below the safety floor), and a written go or no-go.
 
-## 14. Testing strategy at a glance
+## 15. Testing strategy at a glance
 
 | Layer | What | Where |
 |---|---|---|
@@ -249,7 +280,7 @@ Implements `docs/cook-mode-spec.md` and the repair algorithm in `packages/core`.
 
 No snapshot tests of solver plans: solves aren't reproducible, so tests assert properties and bounds.
 
-## 15. Risks specific to the plan
+## 16. Risks specific to the plan
 
 | Risk | Mitigation |
 |---|---|
@@ -260,10 +291,12 @@ No snapshot tests of solver plans: solves aren't reproducible, so tests assert p
 | Verifier drift between languages | Shared conformance suite in CI, no shared implementation |
 | Solver hosting and abuse | ADR in M3, decided before M9 |
 | Scope creep into non-goals | `CLAUDE.md` lists them explicitly, and PRs adding one need a PRD change first |
+| Screens built before they are designed, or cook mode fails in a real kitchen | Design track: cook mode prototyped and kitchen-tested at D1, design system done before M5 |
 
-## 16. Open decisions to resolve during the plan
+## 17. Open decisions to resolve during the plan
 
 - Solver hosting, scaling and abuse protection (ADR in M3).
+- Visual direction, brand and design tooling (decided in D0).
 - How recipe content ships: bundled with the app and updated over the air, or as versioned content packs (decide in M5; the render bundle makes running sessions safe either way).
 - Metrics retention period and ingestion hosting (with legal review, before M7).
 - Whether per-task timing ratios by recipe ID should ever be collected (needs explicit consent text).
@@ -271,7 +304,7 @@ No snapshot tests of solver plans: solves aren't reproducible, so tests assert p
 - Explicit vessel linking in the scheduler (post-MVP).
 - Lock-screen timer display, voice control, label printing (post-MVP).
 
-## 17. Working with Claude Code
+## 18. Working with Claude Code
 
 - Run **one milestone at a time**. Start a session with: "Implement milestone Mx from `docs/implementation-plan.md`. Read `CLAUDE.md` and these documents first: ..." and list the specs the milestone references.
 - Ask for **small, reviewable changes**: one task per change, tests included.
