@@ -2,7 +2,7 @@
 
 Prep Buddy is a mobile app that acts as a cooking coach for **batch meal prep**. The user picks several recipes, and the app computes **one optimized cooking session** (what to batch, what to start first, what to do while something roasts) and walks them through it step by step, with timers, until everything is cooked, portioned and stored. It also handles calorie and macro targets, allergies, a shopping list and simple tracking.
 
-Status: early planning, pre-implementation. Current milestone is **M0** (see `docs/implementation-plan.md`).
+Status: early implementation. Current milestone is **M1** (see `docs/implementation-plan.md`).
 
 ## Repository layout
 
@@ -17,7 +17,7 @@ tools/              CLI tools: data validator, plan viewer, benchmarks
 docs/               Specs, guide, examples, decisions/ (ADRs), reports/
 ```
 
-Most of these directories don't exist yet; they will be scaffolded during M0.
+`data/` is scaffolded but still empty — reviewed content is authored in M8. `apps/mobile/` is scaffolded starting M5.
 
 ## Start here
 

@@ -143,8 +143,8 @@
       "additionalProperties": false,
       "required": ["en", "tr"],
       "properties": {
-        "en": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "tr": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        "en": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "tr": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
       }
     },
     "Allergen": {

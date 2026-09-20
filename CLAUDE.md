@@ -6,7 +6,7 @@ Guidance for Claude Code working in the Prep Buddy repository. Keep this file sh
 
 Prep Buddy is a mobile app that acts as a cooking coach for **batch meal prep**. The user picks several recipes, and the app computes **one optimized cooking session** (what to batch, what to start first, what to do while something roasts) and walks them through it step by step, with timers, until everything is cooked, portioned and stored. It also handles calorie and macro targets, allergies, a shopping list and simple tracking.
 
-**Current milestone:** M1 (see `docs/implementation-plan.md`). M0 (foundations: monorepo, CI, schema codegen) is done. Update this line as milestones complete.
+**Current milestone:** M2 (see `docs/implementation-plan.md`). M0 (foundations) and M1 (data pipeline: schemas, validator, derived-data generator, locale text utilities) are done. Update this line as milestones complete.
 
 ## Read first
 
@@ -18,6 +18,7 @@ Prep Buddy is a mobile app that acts as a cooking coach for **batch meal prep**.
    - `docs/planning-spec.md`: targets, safety rails, filtering, scaling, shopping list, tracking
    - `docs/cook-mode-spec.md`: state machine, timers, notifications, wrap-up
    - `docs/recipe-authoring-guide.md` and `docs/examples/`: how content is authored, with worked fixtures
+   - `docs/design/`: design brief, tokens, wireframes and prototypes. It is created by the design track (D0-D2). If it doesn't exist yet or a screen isn't designed, ask before inventing UI.
 
 ## Repository layout
 
@@ -29,7 +30,7 @@ packages/core/      Shared pure TypeScript: expansion, batching, greedy schedule
 data/               Reviewed ingredients and recipes (YAML), plus generated derived data
 schemas/            JSON Schema (single source of truth) and conformance/ test cases
 tools/              CLI tools: data validator, plan viewer, benchmarks
-docs/               Specs, guide, examples, decisions/ (ADRs), reports/
+docs/               Specs, guide, examples, design/, decisions/ (ADRs), reports/
 ```
 
 ## Non-negotiable rules
@@ -69,16 +70,17 @@ Confirm current versions when scaffolding, and record deviations as ADRs in `doc
 
 ## Commands
 
-Filled in during M0. Keep this list accurate.
+Filled in during M0/M1. Keep this list accurate.
 
 ```
 pnpm install
 pnpm lint && pnpm typecheck
 pnpm test                      # TypeScript unit and property tests
-pnpm schemas:gen               # regenerate types from schemas (CI fails if stale)
-pnpm data:validate             # validate everything in data/
-pnpm conformance               # verifier conformance suite (TypeScript side)
-pnpm bench                     # scheduler benchmarks and the plan viewer
+pnpm schemas:gen                # regenerate types from schemas (CI fails if stale)
+pnpm data:validate               # validate everything in data/ (tools/validate-data)
+pnpm data:generate               # write derived recipe data to data/generated/
+pnpm conformance                 # verifier conformance suite (TypeScript side)
+pnpm bench                      # scheduler benchmarks and the plan viewer
 cd services/solver && uv run pytest    # solver, Python verifier, Python conformance
 ```
 
@@ -87,6 +89,7 @@ cd services/solver && uv run pytest    # solver, Python verifier, Python conform
 - **Pure core.** `packages/core` functions are pure: no I/O, and time and randomness are parameters. Return data (for example verifier violations) instead of throwing for expected outcomes.
 - **Units.** Grams, milliliters, Celsius in storage and computation. Imperial is display-only. Authoring durations are minutes, plans are **integer seconds**.
 - **IDs.** ASCII snake_case slugs, stable, never renamed.
+- **UI.** Screens use design tokens (`docs/design/tokens.json`) and shared components from the design system. No ad-hoc colors, sizes, spacing or strings. If a token or component is missing, ask rather than improvising.
 - **Tests.** Table-driven for formulas and rules, property-based for the scheduler and safety invariants, golden fixtures from `docs/examples/`. **No snapshot tests of solver plans** (solves aren't reproducible): assert properties and bounds. Every bug fix adds a regression test.
 - **Conformance.** A change to any verifier rule needs conformance cases, and both the TypeScript and Python implementations must pass in CI. The two verifiers share **no code**.
 - **Comments** explain why, not what. Cite the spec section for non-obvious rules.

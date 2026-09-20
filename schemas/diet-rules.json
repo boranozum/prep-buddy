@@ -1,0 +1,20 @@
+{
+  "$comment": "HYPOTHESIS, needs dietitian review before it drives filtering (CLAUDE.md 'Sensitive areas'). MVP diet rules from docs/data-model.md section 3.11, modeled as exclusions over Ingredient.diet_flags. Meat sourcing (halal/kosher slaughter) is not verifiable by the app and is out of scope; full kosher handling is a post-MVP open item.",
+  "vegetarian": {
+    "excludes_diet_flags": ["contains_meat", "contains_fish", "contains_gelatin"]
+  },
+  "vegan": {
+    "excludes_diet_flags": [
+      "contains_meat",
+      "contains_fish",
+      "contains_animal_product",
+      "contains_gelatin"
+    ]
+  },
+  "pescatarian": {
+    "excludes_diet_flags": ["contains_meat"]
+  },
+  "no_pork_or_alcohol": {
+    "excludes_diet_flags": ["contains_pork", "contains_alcohol"]
+  }
+}

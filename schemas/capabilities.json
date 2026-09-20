@@ -1,0 +1,14 @@
+{
+  "$comment": "Equipment capability tiers from docs/data-model.md section 3.6. Read by the semantic validator (a baseline method may only require a 'basic' capability) and, from M4, the session builder's kit-availability check. Not a JSON Schema.",
+  "assumed": ["knife", "board", "bowls"],
+  "basic": ["heat_source", "oven", "pot", "pan"],
+  "optional": [
+    "rice_cooker",
+    "slow_cooker",
+    "pressure_cooker",
+    "air_fryer",
+    "food_processor",
+    "blender",
+    "stand_mixer"
+  ]
+}

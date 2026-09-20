@@ -89,6 +89,12 @@ export interface I18NString {
   tr: string;
 }
 export interface I18NStringArray {
-  en: string[];
-  tr: string[];
+  /**
+   * @minItems 1
+   */
+  en: [string, ...string[]];
+  /**
+   * @minItems 1
+   */
+  tr: [string, ...string[]];
 }

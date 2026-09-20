@@ -107,12 +107,20 @@ class I18nString(BaseModel):
     tr: constr(min_length=1)
 
 
+class EnItem(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
+class TrItem(RootModel[constr(min_length=1)]):
+    root: constr(min_length=1)
+
+
 class I18nStringArray(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    en: list[constr(min_length=1)]
-    tr: list[constr(min_length=1)]
+    en: list[EnItem] = Field(..., min_length=1)
+    tr: list[TrItem] = Field(..., min_length=1)
 
 
 class Allergen(Enum):
