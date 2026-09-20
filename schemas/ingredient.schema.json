@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prepbuddy.app/schemas/ingredient.schema.json",
+  "title": "Ingredient",
+  "description": "An entry in data/ingredients/*.yaml. See docs/data-model.md section 3.1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "names",
+    "source",
+    "per_100g",
+    "allergens",
+    "diet_flags",
+    "shopping"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "$ref": "#/$defs/Slug" },
+    "names": { "$ref": "#/$defs/I18nString" },
+    "aliases": { "$ref": "#/$defs/I18nStringArray" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dataset", "fdc_id", "snapshot_date"],
+      "properties": {
+        "dataset": {
+          "enum": ["usda_foundation", "usda_sr_legacy", "example_placeholder"]
+        },
+        "fdc_id": { "type": ["integer", "null"] },
+        "snapshot_date": { "type": ["string", "null"], "format": "date" }
+      }
+    },
+    "per_100g": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kcal", "protein_g", "fat_g", "carbs_g", "fiber_g"],
+      "properties": {
+        "kcal": { "type": "number", "minimum": 0 },
+        "protein_g": { "type": "number", "minimum": 0 },
+        "fat_g": { "type": "number", "minimum": 0 },
+        "carbs_g": { "type": "number", "minimum": 0 },
+        "fiber_g": { "type": "number", "minimum": 0 },
+        "sugar_g": { "type": "number", "minimum": 0 },
+        "sodium_mg": { "type": "number", "minimum": 0 }
+      }
+    },
+    "density_g_per_ml": { "type": "number", "exclusiveMinimum": 0 },
+    "unit_weights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["unit", "grams"],
+        "properties": {
+          "unit": { "type": "string", "minLength": 1 },
+          "grams": { "type": "number", "exclusiveMinimum": 0 }
+        }
+      }
+    },
+    "yield": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cooked_state", "mass_factor"],
+      "properties": {
+        "cooked_state": { "type": "string", "minLength": 1 },
+        "mass_factor": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "allergens": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Allergen" },
+      "uniqueItems": true
+    },
+    "diet_flags": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/DietFlag" },
+      "uniqueItems": true
+    },
+    "shopping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["section", "pack_sizes_g", "staple"],
+      "properties": {
+        "section": {
+          "enum": [
+            "produce",
+            "meat_fish",
+            "dairy_eggs",
+            "dry_goods",
+            "canned",
+            "frozen",
+            "bakery",
+            "spices_oils",
+            "other",
+            "none"
+          ]
+        },
+        "pack_sizes_g": {
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "staple": { "type": "boolean" },
+        "skip": { "type": "boolean" }
+      }
+    },
+    "edible_fraction": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "default": 1
+    },
+    "portion_step_g": { "type": "number", "exclusiveMinimum": 0, "default": 5 },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kcal_check", "reason"],
+      "properties": {
+        "kcal_check": { "const": "exempt" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "deprecated": { "type": "boolean" },
+    "replaced_by": { "$ref": "#/$defs/Slug" }
+  },
+  "$defs": {
+    "Slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"
+    },
+    "I18nString": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "tr"],
+      "properties": {
+        "en": { "type": "string", "minLength": 1 },
+        "tr": { "type": "string", "minLength": 1 }
+      }
+    },
+    "I18nStringArray": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "tr"],
+      "properties": {
+        "en": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "tr": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "Allergen": {
+      "enum": [
+        "celery",
+        "gluten_cereals",
+        "wheat",
+        "crustaceans",
+        "eggs",
+        "fish",
+        "lupin",
+        "milk",
+        "molluscs",
+        "mustard",
+        "peanuts",
+        "sesame",
+        "soybeans",
+        "sulphites",
+        "tree_nuts"
+      ]
+    },
+    "DietFlag": {
+      "enum": [
+        "contains_meat",
+        "contains_fish",
+        "contains_pork",
+        "contains_alcohol",
+        "contains_animal_product",
+        "contains_gelatin"
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+pnpm-lock.yaml
+**/generated/**
+**/dist/**
+**/node_modules/**
+.venv/
+
+# Prose and content docs are not lint targets; data/ is YAML validated by
+# tools/validate-data instead.
+docs/**
+data/**
+*.yaml
+*.yml
+*.md

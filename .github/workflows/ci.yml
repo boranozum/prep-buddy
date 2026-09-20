@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typescript:
+    name: TypeScript (lint, typecheck, test, schema codegen)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: astral-sh/setup-uv@v3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install solver deps (needed by schemas:check)
+        run: uv sync
+        working-directory: services/solver
+
+      - name: Install prototype data validator deps
+        run: pip install pyyaml
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm schemas:check
+      - run: pnpm data:validate
+      - run: pnpm conformance
+
+  solver:
+    name: Solver service (ruff, mypy, pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/solver
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run mypy .
+      - run: uv run pytest

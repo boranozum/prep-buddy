@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "rice_white_long_raw",
+  "names": { "en": "White rice, long grain, raw", "tr": "Pirinç, uzun taneli, çiğ" },
+  "aliases": {
+    "en": ["rice", "long grain rice"],
+    "tr": ["pirinç", "pilavlık pirinç"]
+  },
+  "source": { "dataset": "example_placeholder", "fdc_id": null, "snapshot_date": null },
+  "per_100g": { "kcal": 365, "protein_g": 7.1, "fat_g": 0.7, "carbs_g": 80.0, "fiber_g": 1.3 },
+  "yield": { "cooked_state": "boiled", "mass_factor": 2.8 },
+  "allergens": [],
+  "diet_flags": [],
+  "shopping": { "section": "dry_goods", "pack_sizes_g": [500, 1000, 2500], "staple": false },
+  "edible_fraction": 1.0,
+  "portion_step_g": 5
+}

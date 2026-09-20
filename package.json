@@ -1,0 +1,30 @@
+{
+  "name": "prep-buddy",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@12.5.1",
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "test": "pnpm -r --if-present run test",
+    "schemas:gen": "node scripts/generate-schemas.mjs",
+    "schemas:check": "node scripts/check-schemas.mjs",
+    "data:validate": "python3 docs/examples/validate_examples.py",
+    "conformance": "node scripts/conformance-stub.mjs",
+    "bench": "node scripts/bench-stub.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "eslint": "^9.13.0",
+    "globals": "^17.12.0",
+    "json-schema-to-typescript": "^15.0.2",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0"
+  }
+}

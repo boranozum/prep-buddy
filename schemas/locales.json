@@ -1,0 +1,4 @@
+{
+  "$comment": "Required locales for every I18nString in data/. See docs/data-model.md section 2. Not a JSON Schema itself; read by the build validator and the codegen scripts.",
+  "required": ["en", "tr"]
+}
